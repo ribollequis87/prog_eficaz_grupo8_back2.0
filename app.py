@@ -70,8 +70,8 @@ def send_message():
         message = request.form['message']
         if message:
             collection_mensagens.insert_one({'message': message})
-            return "Message sent successfully", 200
-        return "Message not sent", 400
+            return "Mensagem enviada com sucesso", 200
+        return "Mensagem não enviada", 400
 
 def send_message_to_server(message):
     response = requests.post(f'{url_base}/send_message', data={'message': message})
