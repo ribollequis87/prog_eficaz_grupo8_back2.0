@@ -16,9 +16,7 @@ collection_usuarios = mongo.db.Usuarios
 collection_mensagens = mongo.db.Mensagens
 collection_remedios = mongo.db.Remedios
 
-# @app.route('/home')
-# def home():
-#     return None
+url_base = 'http://127.0.0.1:5000'
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -72,10 +70,11 @@ def send_message():
         message = request.form['message']
         if message:
             collection_mensagens.insert_one({'message': message})
-        return redirect(request.url)  # Redirect to the same page
+            return "Message sent successfully", 200
+        return "Message not sent", 400
 
 def send_message_to_server(message):
-    response = requests.post('http://127.0.0.1:5000/send_message', data={'message': message})
+    response = requests.post(f'{url_base}/send_message', data={'message': message})
     if response.status_code == 200:
         return True
     else:
@@ -88,7 +87,7 @@ def get_messages():
         return jsonify(messages)
     
 def get_messages_from_server():
-    response = requests.get('http://127.0.0.1:5000/get_messages')
+    response = requests.get(f'{url_base}/get_messages')
     if response.status_code == 200:
         return response.json()
     else:
