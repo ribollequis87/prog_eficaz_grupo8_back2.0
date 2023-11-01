@@ -84,12 +84,15 @@ def send_message_to_server(message):
 def get_messages():
     if request.method == 'GET':
         messages = list(collection_mensagens.find())
-        return jsonify(messages)
+        for message in messages:
+            message["_id"] = str(message["_id"])
+        return messages
     
 def get_messages_from_server():
     response = requests.get(f'{url_base}/get_messages')
     if response.status_code == 200:
-        return response.json()
+        print(response.status_code)
+        return response.json() 
     else:
         return []
     
