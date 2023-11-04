@@ -18,6 +18,8 @@ collection_remedios = mongo.db.Remedios
 
 url_base = 'http://127.0.0.1:5000'
 
+# 1- Login
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     request_data = request.json
@@ -36,13 +38,15 @@ def login():
         user = collection_usuarios.find_one({"username": usuario, "password": senha})
         
         if user:
-            return redirect(url_for('home'))
+            return redirect(f"{url_base}/home")
         else:
-            return "Nome de usuário e/ou senha inválido(s)"
+            return jsonify("Nome de usuário e/ou senha inválido(s)"), 400
+
+
+# 2- Cadastro
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro_usuario():
-    # return None
     request_data = request.json
 
     if request.method == 'POST':
@@ -62,7 +66,10 @@ def cadastro_usuario():
         else:
             novo_usuario = {"username": usuario, "email": email, "password": senha}
             collection_usuarios.insert_one(novo_usuario)
-            return redirect(url_for('login'))
+            return redirect(f"{url_base}/login")
+        
+
+# 3- Comunidade
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
@@ -95,6 +102,9 @@ def get_messages_from_server():
         return response.json() 
     else:
         return []
+    
+
+# 4- Remédios
     
 @app.route('/remedios', methods=['GET', 'POST'])
 def remedios():
