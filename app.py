@@ -41,7 +41,7 @@ def login():
         user = collection_usuarios.find_one({"username": usuario, "password": senha})
         
         if user:
-            return redirect(f"{url_base}/home")
+            return "Login concluído", 200
         else:
             return jsonify("Nome de usuário e/ou senha inválido(s)"), 400
 
@@ -86,7 +86,7 @@ def send_message():
         message = request.form['message']
         if message:
             current_time = datetime.now().strftime('%H:%M %Y-%m-%d')
-            collection_mensagens.insert_one({'message': message, 'datetime': current_time, 'likes': 0})
+            collection_mensagens.insert_one({'message': message, 'datetime': current_time})
             return "Mensagem enviada com sucesso", 200
         return "Mensagem não enviada", 400
 
@@ -103,20 +103,7 @@ def get_messages():
         messages = list(collection_mensagens.find())
         for message in messages:
             message["_id"] = str(message["_id"])
-            message["like_button"] = f"/like_message/{message['_id']}"
         return jsonify(messages)
-
-# Adicione uma rota para aumentar os likes quando o botão "like" for pressionado
-@app.route('/like_message/<message_id>', methods=['POST'])
-def like_message(message_id):
-    if request.method == 'POST':
-        message = collection_mensagens.find_one({"_id": ObjectId(message_id)})
-        if message:
-            current_likes = message.get('likes', 0)
-            updated_likes = current_likes + 1
-            collection_mensagens.update_one({"_id": ObjectId(message_id)}, {"$set": {"likes": updated_likes}})
-            return "Mensagem curtida", 200
-        return "Mensagem não encontrada", 404
     
 def get_messages_from_server():
     response = requests.get(f'{url_base}/get_messages')
