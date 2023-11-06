@@ -67,15 +67,21 @@ def cadastro_usuario():
             return jsonify("Os campos não foram preenchidos por completo."), 400
      
         else:
-            novo_usuario = {"username": usuario, "email": email, "password": senha}
-            collection_usuarios.insert_one(novo_usuario)
-            return redirect(f"{url_base}/login")
-        
+            collection_usuarios.insert_one({'username': usuario, 'email': email, 'password': senha})
+            return "Usuário cadastrado", 200
 
+# envia informações do usuário para o servidor
+def send_user_to_server(username, email, password):
+    response = requests.post(f'{url_base}/cadastro', data={'username': username, 'email': email, 'password': password})
+    if response.status_code == 200:
+        return True
+    else:
+        return False
+        
 # 3- Comunidade
 
 @app.route('/send_message', methods=['POST'])
-def send_message():
+def send_message(): 
     if request.method == 'POST':
         message = request.form['message']
         if message:
