@@ -123,7 +123,7 @@ def get_messages_from_server():
 
 # 4- Remédios
     
-@app.route('/remedios', methods=['GET', 'POST'])
+@app.route('/remedios', methods=['POST'])
 def remedios():
     data = request.json
     if request.method == 'POST':
@@ -141,9 +141,29 @@ def remedios():
         novo_remedio = {"remedio": remedio, "frequencia": frequencia, "horario": horario}
         collection_remedios.insert_one(novo_remedio)
 
+
+def send_remedio_to_server(remedio):
+    response = requests.post(f'{url_base}/remedios', data={'remedio': remedio})
+    if response.status_code == 200:
+        return True
+    else:
+        return False
+
+@app.route('/remedios/<id_usuario>', methods=['GET'])
+def get_remedios(id_usuario):
     if request.method == 'GET':
-        remedios = collection_remedios.find()
-        return jsonify(remedios)
+        remedios = list(collection_remedios.find({"_id": ObjectId(id_usuario)}))
+        for remedio in remedios:
+            remedio["_id"] = str(remedio["_id"])
+        return remedios
+    
+def get_remedios_from_server():
+    response = requests.get(f'{url_base}/remedios')
+    if response.status_code == 200:
+        print(response.status_code)
+        return response.json() 
+    else:
+        return []
 
 if __name__ == '__main__':
     app.run(debug=True)
