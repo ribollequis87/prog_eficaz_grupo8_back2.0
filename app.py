@@ -6,6 +6,8 @@ from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash # Para criptografar a senha
 from flask import jsonify, Flask, request
 import requests
+from datetime import datetime
+
 
 app = Flask(__name__)
 # app.config["MONGO_URI"] = f"mongodb+srv://{credentials['user_mongo']}:{credentials['password_mongo']}@{settings['host']}/{settings['database']}?retryWrites=true&w=majority"
@@ -76,7 +78,8 @@ def send_message():
     if request.method == 'POST':
         message = request.form['message']
         if message:
-            collection_mensagens.insert_one({'message': message})
+            current_time = datetime.now().strftime('%H:%M %Y-%m-%d')
+            collection_mensagens.insert_one({'message': message, 'datetime': current_time})
             return "Mensagem enviada com sucesso", 200
         return "Mensagem não enviada", 400
 
