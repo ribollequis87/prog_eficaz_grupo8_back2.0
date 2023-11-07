@@ -1,7 +1,5 @@
 from flask import Flask, request, redirect, url_for
-# from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from flask_pymongo import PyMongo
-# from .credentials_file import credentials, settings
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash # Para criptografar a senha
 from flask import jsonify, Flask, request
@@ -11,7 +9,6 @@ from bson.objectid import ObjectId
 
 
 app = Flask(__name__)
-# app.config["MONGO_URI"] = f"mongodb+srv://{credentials['user_mongo']}:{credentials['password_mongo']}@{settings['host']}/{settings['database']}?retryWrites=true&w=majority"
 app.config["MONGO_URI"] = "mongodb+srv://admin:admin@projagil.d9zuddb.mongodb.net/db_projeto"
 mongo = PyMongo(app)
 
@@ -65,6 +62,9 @@ def cadastro_usuario():
         
         elif usuario is None or email is None or senha is None:
             return jsonify("Os campos não foram preenchidos por completo."), 400
+        
+        if "@" not in email:
+            return jsonify("E-mail inválido."), 400
      
         else:
             collection_usuarios.insert_one({'username': usuario, 'email': email, 'password': senha})
